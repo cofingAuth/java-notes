@@ -1,11 +1,14 @@
 ## 系统设计与实现，需要考虑什么？
 正确性、健壮性、可靠性、效率、易用性、可读性（可理解性）、可扩展性、可复用性、兼容性、可移植性
 
+## 设计模式六大原则
+单一职责原则、里氏替换原则、依赖倒置原则、接口隔离原则、迪米特法则、开闭原则
+
 ## 设计模式
 1. 创建型模式
 	- 单例模式
 	- 工厂方法模式
-	- 抽象工厂方法模式
+	- 抽象工厂模式
 	- 建造者模式
 	- 原型模式
 2. 结构型模式
@@ -193,3 +196,114 @@
 	        return threadLocal.get();
 	    }
 	}
+
+### 1.2 工厂模式
+分类：简单工厂、工厂方法、抽象工厂模式
+#### 简单工厂
+特点：一个工厂类根据传入的参量决定创建出那一种产品类的实例  
+情况：例如游戏控制类，如果游戏控制类引入游戏工厂类，则新增游戏后，游戏控制类不需要修改，只需要修改游戏工厂类；
+优点：使用对象与创建实例的分离，实现解耦
+缺点：违背开闭原则，如新增游戏，则需要修改游戏工厂；
+	
+	/**
+	 * 游戏抽象类
+	 */
+	public abstract class Game {
+	    public String name;
+	
+	    abstract void open();
+	
+	    abstract void close();
+	}
+	
+	/**
+	 * NBA游戏
+	 */
+	public class NBAGame extends Game{
+	    public NBAGame() {
+	        super.name = "NBA";
+	    }
+	
+	    @Override
+	    void open() {
+	        System.out.println(super.name + " open");
+	    }
+	
+	    @Override
+	    void close() {
+	        System.out.println(super.name + " close");
+	    }
+	}
+
+	/**
+	 * 王者荣耀游戏
+	 */
+	public class WzryGame extends Game{
+	    public WzryGame() {
+	        super.name = "wzry";
+	    }
+	
+	    @Override
+	    void open() {
+	        System.out.println(super.name + " open");
+	    }
+	
+	    @Override
+	    void close() {
+	        System.out.println(super.name + " close");
+	    }
+	}
+
+	/**
+	 * 简单工厂类
+	 */
+	public class SimpleFactory {
+	    public static Game getGame(String gameName){
+	        if("wzry".equalsIgnoreCase (gameName)){
+	            return new WzryGame ();
+	        }else if("NBA".equalsIgnoreCase (gameName)){
+	            return new NBAGame ();
+	        }
+	        return null;
+	    }
+	}
+
+#### 工厂方法模式
+特点：定义一个创建对象的接口，让子类决定实例化那个类  
+使用情况：可以参考spring的AbstractBeanFactory抽象类  
+优点：更符合开闭原则；如新增游戏，新增具体游戏与相应工厂；
+
+	public abstract class AbstractFactoryGame {
+	    public Game getGame(){
+	        return createGame();
+	    };
+	
+	    public abstract Game createGame();
+	}
+
+	public class NBAFactoryGame extends AbstractFactoryGame{
+	    @Override
+	    public Game createGame() {
+	        return new NBAGame ();
+	    }
+	}
+
+
+	/**
+	 * spring的AbstractBeanFactory抽象类，他的实现类很多，可以查看ListFactoryBean
+	 */
+	public final T getObject() throws Exception {
+        //单例，从缓存获取，或暴露早期实例，以解决循环引用
+        if (isSingleton()) {
+            return (this.initialized ? this.singletonInstance : getEarlySingletonInstance());
+        }
+        else {
+            return createInstance();
+        }
+    }
+
+    //创建对象
+    protected abstract T createInstance() throws Exception;
+
+#### 抽象工厂模式
+特点：创建相关或依赖对象的家族，而无需明确指定具体类 

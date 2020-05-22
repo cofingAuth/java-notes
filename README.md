@@ -307,3 +307,65 @@
 
 #### 抽象工厂模式
 特点：创建相关或依赖对象的家族，而无需明确指定具体类 
+优点：分离接口与实现；使切换产品族变得容易
+缺点：扩展影响大，如修改工厂则需要同时修改所有工厂实现类
+情况：系统选择天美游戏或者选择光子游戏其中一种，则可以使用抽象工厂；
+
+	public abstract class AbstractFactory {
+	    abstract void eatChickenGame();
+	    abstract void racingCarGame();
+	}
+
+	public class TiMeiFactory extends AbstractFactory{
+	    @Override
+	    void eatChickenGame() {System.out.println("天美吃鸡游戏");}
+	
+	    @Override
+	    void racingCarGame() {System.out.println("天美赛车游戏");}
+	}
+	
+	public class GuangZiFactory extends AbstractFactory{
+	    @Override
+	    void eatChickenGame() {System.out.println("光子吃鸡游戏");}
+	
+	    @Override
+	    void racingCarGame() {System.out.println("光子赛车游戏");}
+	}
+
+#### 建造者模式
+特点：封装一个复杂对象的构建过程，并可以按步骤构造  
+优点：易于扩展（例如新增一个具体建造者，只需要加入不同属性参数，无需修改原类）；产品的建造与表现分离解耦；创建过程细化易于控制清晰  
+缺点：产品必有有共同点；内部复杂，会有很多建造类；  
+情况：可以参考org.apache.http.client.utils.URIBuilder
+	
+	public class RequestBuilder {
+	    private String scheme;
+	    private String host;
+	
+	    public RequestBuilder(){}
+	
+	    public RequestBuilder setScheme(final String scheme){
+	        this.scheme = scheme;
+	        return this;
+	    }
+	
+	    public RequestBuilder setHost(final String host){
+	        this.host = host;
+	        return this;
+	    }
+	
+	    public String builder() {
+	        return "RequestBuilder{" +
+	                "scheme='" + scheme + '\'' +
+	                ", host='" + host + '\'' +
+	                '}';
+	    }
+	
+	    public static void main(String[] args) {
+	        String request = new RequestBuilder().setScheme ("http").setHost("www.google.com").builder ();
+	        System.out.println (request);
+	    }
+	}
+
+#### 原型模式
+特点：通过复制现有的实例来创建新的实例

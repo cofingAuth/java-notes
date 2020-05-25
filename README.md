@@ -368,4 +368,60 @@
 	}
 
 #### 原型模式
-特点：通过复制现有的实例来创建新的实例
+特点：通过复制现有的实例来创建新的实例  
+优点：在类初次化消耗资源多或需要繁琐的数据处理情况下，性能高  
+缺点：需要注意浅拷贝的对象是否有引用对象的拷贝  
+情况：类初次化消耗资源多或需要繁琐的数据处理，使用的对象属性信息基本一致  
+实现：  
+	- 实现Cloneable接口，重写clone方法  
+	- 实现Serializable接口，重写clone方法  
+
+	/**
+	 * 浅拷贝：只拷贝按值传递的数据，比如String与基本类型；但引用对象、数组的拷贝是与原本的对象指向同一个内存地址
+	 * 深拷贝：解决了浅拷贝的引用对象与数组拷贝指向同一个内存地址情况；
+	 * @author Administrator
+	 * @date 2020/5/25
+	 */
+	public class ShallowClone implements Cloneable{
+	    public String name;
+	    public String[] alias;
+	
+	    //浅拷贝
+	    @Override
+	    protected Object clone() throws CloneNotSupportedException {
+	        return super.clone ();
+	    }
+	
+	    /*深拷贝；则对数据/引用对象手动重新生成；
+	    @Override
+	    protected Object clone() throws CloneNotSupportedException {
+	        ShallowClone sc = (ShallowClone) super.clone ();
+	        sc.alias = Arrays.copyOf (sc.alias, alias.length);
+	        return sc;
+	    }*/
+	}
+
+	/**
+	 * 深拷贝：序列化实现，首先把对象序列化则写进二进制流，然后再反序列化则从流中读出来
+	 */
+	public class DeepClone implements Serializable {
+	    public String name;
+	    public String[] alias;
+	
+	    @Override
+	    protected Object clone() throws CloneNotSupportedException {
+	        try {
+	            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream ();
+	            ObjectOutputStream objectOutputStream = new ObjectOutputStream (byteArrayOutputStream);
+	            objectOutputStream.writeObject (this);
+	            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream (byteArrayOutputStream.toByteArray ());
+	            ObjectInputStream objectInputStream = new ObjectInputStream (byteArrayInputStream);
+	            return objectInputStream.readObject ();
+	        } catch (IOException e) {
+	            e.printStackTrace ();
+	        } catch (ClassNotFoundException e) {
+	            e.printStackTrace ();
+	        }
+	        return null;
+	    }
+	}

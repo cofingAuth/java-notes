@@ -425,3 +425,145 @@
 	        return null;
 	    }
 	}
+
+#### 适配器模式
+特点：将一个类的方法接口转换成客户希望的另外一个接口  
+优点：可以让任何两个没有关联的类一起运行、提高类的复用性、增加类的透明度、灵活性好  
+缺点：过多地使用适配器，会让系统非常零乱，不易整体进行把握  
+实现：类的适配器模式（继承）、对象的适配器模式（引用对象）  
+情况：服务订单操作场景
+	
+	/************************ 类的适配器模式（继承）************************/
+	/**
+	 * 订单服务提交接口
+	 */
+	public interface OrderServiceSave {
+	    void save();
+	}
+
+	/**
+	 * 把数据保存到数据库的操作类
+	 */
+	public class DoSaveOrderSerivce implements OrderServiceSave{
+	    @Override
+	    public void save() {
+	        System.out.println ("save database");
+	    }
+	}
+
+	/**
+	 * 目标(Target)角色,这就是所期待得到的接口
+	 */
+	public interface SafetyHandle {
+	    void safetySave();
+		void safetyGet();
+	}
+
+	/**
+	 * 适配器
+	 */
+	public class DatabaseSafetyHandle extends DoSaveOrderSerivce implements SafetyHandle{
+	    @Override
+	    public void safetySave() {
+	        System.out.println ("安全1：记录操作者");
+	        super.save ();
+	        System.out.println ("安全2：具体...数据已保存成功");
+	    }
+		@Override
+	    public void safetyGet() {}
+	}
+	
+	/************************ 对象的适配器模式（引用对象）************************/
+	/**
+	 * 从数据库把数据读出来的操作类
+	 */
+	public class DoGetOrderSerivce implements OrderServiceGet{
+	    @Override
+	    public void get() {
+	        System.out.println ("get order data from database");
+	    }
+	}
+	
+	/**
+	 * 适配器
+	 */
+	public class DatabaseSafetyHandleImpl implements SafetyHandle{
+	    private OrderServiceSave orderServiceSave;
+	    private OrderServiceGet orderServiceGet;
+	
+	    public DatabaseSafetyHandleImpl(OrderServiceSave orderServiceSave, OrderServiceGet orderServiceGet){
+	        this.orderServiceSave = orderServiceSave;
+	        this.orderServiceGet = orderServiceGet;
+	    }
+	
+	    @Override
+	    public void safetySave() {
+	        System.out.println ("安全1：记录操作者");
+	        this.orderServiceSave.save ();
+	        System.out.println ("安全2：具体...数据已保存成功");
+	    }
+	
+	    @Override
+	    public void safetyGet() {
+	        System.out.println ("安全1：验证");
+	        this.orderServiceGet.get ();
+	    }
+	}
+	
+
+
+#### 装饰者模式
+特点：动态的给对象添加新的功能  
+优点：1. 开闭原则; 2. 装饰模式是继承的一个替代模式，装饰模式可以动态扩展一个实现类的功能; 3. 装饰类和被装饰类可以独立发展，不会相互耦合;   
+缺点：1. 会出现更多的代码，更多的类，增加程序的复杂性; 2. 动态装饰时，多层装饰时会更复杂   
+与适配器的不同：装饰者模式和被装饰的类要实现同一个接口，或者装饰类是被装饰的类的子类。 适配器模式和被适配的类具有不同的接口  
+情况：服务订单操作场景，可以引入不同服务商进行操作
+
+	/**
+	 * 订单服务接口：为简单化，只定义了一个提交方法
+	 */
+	public interface OrderService {
+	    void save();
+	}
+	
+	/**
+	 * 订单基础操作类
+	 */
+	public class OrderBase implements OrderService {
+	    @Override
+	    public void save() {
+	        System.out.println ("操作保存到数据库");
+	    }
+	}
+
+	/**
+	 * 服务订单操作的装饰者抽象类
+	 */
+	public abstract class AbstractOrderDecorator implements OrderService{
+	    private OrderService orderService;
+	
+	    public AbstractOrderDecorator(OrderService orderService){
+	        this.orderService = orderService;
+	    }
+	
+	    @Override
+	    public void save() {
+	        this.orderService.save ();
+	    }
+	}
+	
+	/**
+	 * alibaba装饰者服务订单操作，需要先把订单发送到alibaba
+	 */
+	public class AlibabaOrder extends AbstractOrderDecorator{
+	
+	    public AlibabaOrder(OrderService orderService) {
+	        super (orderService);
+	    }
+	
+	    @Override
+	    public void save() {
+	        System.out.println ("订单先发送到alibaba");
+	        super.save ();
+	    }
+	}

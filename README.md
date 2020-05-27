@@ -567,3 +567,130 @@
 	        super.save ();
 	    }
 	}
+
+#### 代理模式
+特点：为其他对象提供一个代理以便控制这个对象的访问  
+优点：1、职责清晰。 2、高扩展性。 3、智能化;  
+缺点：增加了客户端和真正主题之间中间层;  
+实现：静态代理、动态代理（JDK、CGLIB）  
+情况：火车票，黄牛相当于代理；我们可以通过黄牛买票，黄牛不仅能代售点卖票，还额外收取手续费，同时屏蔽了售点的其它功能（如退票）；
+
+	public interface SubjectService {
+	    void push();
+	    void pull();
+	}
+
+	public class RealSubject implements SubjectService{
+	    @Override
+	    public void push() {
+	        System.out.println ("push");
+	    }
+	
+	    @Override
+	    public void pull() {
+	        System.out.println ("pull");
+	    }
+	}
+
+	/**
+	 * 静态代理
+	 * 目标对象、代理对象需要实现同一接口；灵活度不够，如接口修改，目标、代理对象都需要维护
+	 */
+	public class SubjectProxy implements SubjectService{
+	    private SubjectService subjectService;
+	
+	    public SubjectProxy(SubjectService subjectService) {
+	        this.subjectService = subjectService;
+	    }
+	
+	    @Override
+	    public void push() {
+	        System.out.println ("proxy start");
+	        this.subjectService.push ();
+	        System.out.println ("proxy end");
+	    }
+	
+	    @Override
+	    public void pull() {
+	        throw new RuntimeException ("not support");
+	    }
+	}
+
+	/**
+	 * JDK动态代理
+	 * 代理对象不需要实现接口，但是目标对象必须实现接口
+	 */
+	public class ProxyFactory {
+	    private Object target;
+	
+	    public ProxyFactory(Object target) {
+	        this.target = target;
+	    }
+	
+	    public Object getProxyInstance(){
+	        return Proxy.newProxyInstance (this.target.getClass ().getClassLoader (),
+	                this.target.getClass ().getInterfaces (),
+	                (proxy, method, args) -> {
+	                    System.out.println ("do method start");
+	                    return method.invoke (this.target, args);
+	                });
+	    }
+	}
+
+	/**
+	 * CGLIB动态代理
+	 * 目标类没有必须要求需要实现接口；CGLIB生成的代理类继承目标类；
+	 */
+	public class CGLibProxy implements MethodInterceptor {
+	    public Object getProxyInstance(Object target){
+	        //工具类
+	        Enhancer enhancer = new Enhancer();
+	
+	        //设置父类
+	        enhancer.setSuperclass (target.getClass ());
+	
+	        //设置回调
+	        enhancer.setCallback (this);
+	
+	        //生成代理类对象
+	        return enhancer.create ();
+	    }
+	
+	    @Override
+	    public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
+	        System.out.println ("start: " +  method.getName ());
+	        Object object = methodProxy.invokeSuper (o, objects);
+	        System.out.println ("end: " + method.getName ());
+	        return object;
+	    }
+	
+	    public static void main(String[] args) {
+	        CGLibProxy proxy = new CGLibProxy();
+	        RealSubject realProxy = (RealSubject)proxy.getProxyInstance (new RealSubject());
+	        realProxy.push ();
+	    }
+	}
+
+#### 外观模式
+特点：对外提供一个统一的方法，来访问子系统中的一群接口  
+优点：1、减少系统相互依赖。 2、提高灵活性。 3、提高了安全性  
+缺点：不符合开闭原则  
+意图：为子系统中的一组接口提供一个一致的界面，外观模式定义了一个高层接口，这个接口使得这一子系统更加容易使用  
+简单来说：针对相同功能进行分组封装，简化客户端调用，屏蔽内部实现逻辑
+
+	public interface SpiderService {
+	    void start();
+	}
+
+	/**
+	 * 外观模式
+	 * 蜘蛛爬虫，为客户端调用提供一个接口，组合了一组接口处理；
+	 */
+	public class SpiderFacede implements SpiderService{
+	    @Override
+	    public void start() {
+	        System.out.println ("引用对象1：蜘蛛抓取数据");
+	        System.out.println ("引用对象2：解析数据");
+	        System.out.println ("引用对象2：保存数据");
+	    }
+	}

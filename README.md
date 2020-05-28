@@ -694,3 +694,88 @@
 	        System.out.println ("引用对象2：保存数据");
 	    }
 	}
+
+#### 组合模式
+特点：将对象组合成树形结构以表示“”部分-整体“”的层次结构  
+优点：简化客户端代码，处理单个对象和组合对象；组合体新增不影响客户端使用；  
+缺点：设计较复杂，客户端需要花更多时间理清类之间的层次关系；  
+情况：配置文件处理类，java处理类，xml处理类
+
+	public interface Configurer {
+	    void addConfigurer(List<Configurer> configurers );
+	    String getConfigurerName();
+	    void matchHandler(String name);
+	}
+	
+	public class JavaConfigurer implements Configurer{
+	    @Override
+	    public void addConfigurer(List<Configurer> configurers) {
+	    }
+	
+	    @Override
+	    public String getConfigurerName() {
+	        return "java";
+	    }
+	
+	    @Override
+	    public void matchHandler(String name) {
+	        System.out.println ("match success; do thing");
+	    }
+	}
+
+	public class XmlConfigurer implements Configurer{
+	    @Override
+	    public void addConfigurer(List<Configurer> configurers) {
+	    }
+	
+	    @Override
+	    public String getConfigurerName() {
+	        return "xml";
+	    }
+	
+	    @Override
+	    public void matchHandler(String name) {
+	        System.out.println ("match success; do thing");
+	    }
+	}
+
+	public class ConfigurerComposite implements Configurer{
+	    private final List<Configurer> configurers = new ArrayList<> ();
+	    @Override
+	    public void addConfigurer(List<Configurer> configurers) {
+	        this.configurers.addAll (configurers);
+	    }
+	
+	    @Override
+	    public String getConfigurerName() {
+	        return "composite";
+	    }
+	
+	    @Override
+	    public void matchHandler(String name) {
+	        for(Configurer configurer : this.configurers){
+	            if(configurer.getConfigurerName ().equals (name)) {
+	                configurer.matchHandler (name);
+	                break;
+	            }
+	        }
+	    }
+	
+	    public static void main(String[] args) {
+	        Configurer java = new JavaConfigurer ();
+	        Configurer xml = new XmlConfigurer ();
+	        List<Configurer> configurerList = new ArrayList<> ();
+	        configurerList.add (java);
+	        configurerList.add(xml);
+	        Configurer cc = new ConfigurerComposite();
+	        cc.addConfigurer ( configurerList);
+	        //客户端调用
+	        cc.matchHandler ("java");
+	        cc.matchHandler ("xml");
+	    }
+	}
+
+#### 桥接模式
+特点：将抽象部分和它的实现部分分离，使它们都可以独立的变化  
+优点：  
+缺点：

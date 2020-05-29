@@ -777,5 +777,133 @@
 
 #### 桥接模式
 特点：将抽象部分和它的实现部分分离，使它们都可以独立的变化  
-优点：  
-缺点：
+优点：分离抽象和实现部分; 更好的扩展性  
+角色：抽象化角色、修正抽象化角色、实现化角色、具体实现化角色  
+场景：电脑：品牌（联想、雷神）、类型（笔记本、台式），这两个维度都是需要相互作用构成一起  
+更好例子：可以参考JDBC使用桥接模式（Driver、DriverManager、JDBC的API、具体驱动如mysql）
+
+	/**
+	 * 实现化角色
+	 */
+	public interface Brand {
+	    void connect();
+	}
+	
+	/**
+	 * 具体实现化角色：雷神
+	 */
+	public class ThunderobotBrand implements Brand{
+	    @Override
+	    public void connect() {
+	        System.out.println ("接入雷神驱动");
+	    }
+	}
+	
+	/**
+	 * 具体实现化角色：联想
+	 */
+	public class LenovoBrand implements Brand{
+	    @Override
+	    public void connect() {
+	        System.out.println ("接入联想驱动");
+	    }
+	}
+	
+	/**
+	 * 抽象化角色：计算机
+	 */
+	public abstract class Computer {
+	    protected Brand brand;
+	
+	    protected Computer(Brand brand) {
+	        this.brand = brand;
+	    }
+	
+	    public abstract void build();
+	}
+	
+	/**
+	 * 修正抽象化角色：台式电脑
+	 */
+	public class DesktopComputer extends Computer{
+	    public DesktopComputer(Brand brand) {
+	        super (brand);
+	    }
+	
+	    @Override
+	    public void build() {
+	        System.out.println ("台式组装");
+	        super.brand.connect ();
+	    }
+	}
+	
+	/**
+	 * 修正抽象化角色：笔记本电脑
+	 */
+	public class NotebookComputer extends Computer{
+	    public NotebookComputer(Brand brand) {
+	        super (brand);
+	    }
+	
+	    @Override
+	    public void build() {
+	        System.out.println ("笔记本组装");
+	        super.brand.connect ();
+	    }
+	}
+
+#### 享元模式
+特点：通过共享技术来有效的支持大量细粒度的对象  
+优点：相同对象只要保存一份，这降低了系统中对象的数量，从而降低了系统中细粒度对象给内存带来的压力  
+缺点：提高了系统的复杂度，需要分离出外部状态和内部状态，而且外部状态具有固有化的性质，不应该随着内部状态的变化而变化，否则会造成系统的混乱  
+看法：看起来像单例模式  
+场景: 武器，玩家可能拥有相同得武器
+
+	/**
+	 * 抽象享元角色
+	 */
+	public interface Weapon {
+	    void display();
+	}
+	/**
+	 * 具体享元：炮武器
+	 */
+	public class GunWeapon implements Weapon{
+	    @Override
+	    public void display() {
+	        System.out.println ("炮武器");
+	    }
+	}
+	
+	/**
+	 * 具体享元：剑武器
+	 */
+	public class SwordWeapon implements Weapon {
+	    @Override
+	    public void display() {
+	        System.out.println ("剑武器");
+	    }
+	}
+	/**
+	 * 享元工厂
+	 */
+	public class WeaponFactory {
+	    private static final Map<String, Weapon> weaponMap = new HashMap<> ();
+	
+	    public static Weapon getWeapon(String weaponName){
+	        Weapon weapon = weaponMap.get (weaponName);
+	        if(weapon == null){
+	            try {
+	                weapon = (Weapon) Class.forName (weaponName).newInstance ();
+	            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+	                e.printStackTrace ();
+	                return null;
+	            }
+	            weaponMap.put (weaponName, weapon);
+	        }
+	        return weapon;
+	    }
+	}
+
+#### 策略模式
+特点：定义一系列算法，把他们封装起来，并且使它们可以相互替换  

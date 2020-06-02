@@ -857,7 +857,7 @@
 优点：相同对象只要保存一份，这降低了系统中对象的数量，从而降低了系统中细粒度对象给内存带来的压力  
 缺点：提高了系统的复杂度，需要分离出外部状态和内部状态，而且外部状态具有固有化的性质，不应该随着内部状态的变化而变化，否则会造成系统的混乱  
 看法：看起来像单例模式  
-场景: 武器，玩家可能拥有相同得武器
+情况：武器，玩家可能拥有相同得武器
 
 	/**
 	 * 抽象享元角色
@@ -907,3 +907,109 @@
 
 #### 策略模式
 特点：定义一系列算法，把他们封装起来，并且使它们可以相互替换  
+优点：算法可以自由切换 避免使用多重条件判断 扩展性良好  
+缺点：策略类会增多 所有策略类都需要对外暴露  
+情况：实现同一个接口的不同的类，可以任意地替换；例如：生成订单前，需要做不同的判断，为了演示策略模式，我只判断一种情况  
+
+	public interface OrderCheck {
+	    void run () throws Exception;
+	}
+
+	/**
+	 * 策略：验证是否身份
+	 */
+	public class ValidIdentidyOrderCheck implements OrderCheck{
+	    @Override
+	    public void run() throws Exception {
+	        System.out.println ("判断是游客，还是有效的用户");
+	    }
+	}
+	/**
+	 * 策略：验证是否收到订单的金额
+	 */
+	public class ValidMoneyOrderCheck implements OrderCheck{
+	    @Override
+	    public void run() throws Exception {
+	        System.out.println ("验证是否收到对应金额");
+	    }
+	}
+
+	public class UseStrategy {
+	    private OrderCheck orderCheck;
+	
+	    public void setOrderCheck(OrderCheck orderCheck) {
+	        this.orderCheck = orderCheck;
+	    }
+	
+	    public static void main(String[] args) {
+	        UseStrategy useStrategy = new UseStrategy();
+	        //这订单需要验证身份
+	        useStrategy.setOrderCheck (new ValidIdentidyOrderCheck ());
+	        //这订单需要验证金额
+	        useStrategy.setOrderCheck (new ValidMoneyOrderCheck ());
+	    }
+	}
+
+#### 模板方法模式
+特点：定义一个算法结构，而将一些步骤延迟到子类实现  
+优点：封装不变，扩展可变；流程由父类控制，子类进行实现  
+缺点：每一个不同的实现都需要一个子类来实现，导致类的个数增加，使得系统更加庞大  
+情况：订单流程，需要验证、保存数据库、发送短信；  
+角色：  
++ 抽象模板：抽象模板类，定义了一套算法框架/流程；  
++ 具体实现：具体实现类，对算法框架/流程的某些步骤进行了实现；  
+
+	/**
+	 * 抽象模板
+	 * 在这个例子情况下，抽象验证方法，可以优化成配合工厂方法+数据库配置动态改动和复重验证类
+	 */
+	public abstract class AbstractTemplate {
+	    public final void run(Object object){
+	        valid(object);
+	        save ();
+	        sendMessage ();
+	    }
+	
+	    public abstract void valid(Object object);
+	
+	    private void save(){
+	        System.out.println ("save database");
+	    }
+	
+	    public void sendMessage(){
+	        System.out.println ("选择性覆盖的方法，发短信");
+	    }
+	}
+	
+	/**
+	 * 具体实现案例一
+	 */
+	public class CommonTemplate extends AbstractTemplate{
+	    @Override
+	    public void valid(Object object) {
+	        System.out.println ("valid 1");
+	        System.out.println ("valid 2");
+	        System.out.println ("valid 3");
+	    }
+	}
+	
+	/**
+	 * 具体实现案例二
+	 */
+	public class CommonSendMsgTemplate extends AbstractTemplate{
+	    @Override
+	    public void valid(Object object) {
+	        System.out.println ("valid 1");
+	        System.out.println ("valid 2");
+	    }
+	
+	    @Override
+	    public void sendMessage() {
+	        System.out.println ("实现发送短信");
+	    }
+	}
+
+#### 观察者模式
+特点：对象间的一对多的依赖关系  
+优点：
+缺点：  

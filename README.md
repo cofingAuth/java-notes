@@ -1010,6 +1010,68 @@
 	}
 
 #### 观察者模式
-特点：对象间的一对多的依赖关系  
-优点：
+特点：对象间的一对多的依赖关系；又被称为"发布-订阅"模式  
+优点：观察者和被观察者是抽象耦合的 建立一套触发机制  
 缺点：  
++ 如果一个被观察者对象有很多的直接和间接的观察者的话，将所有的观察者都通知到会花费很多时间  
++ 如果观察者和观察目标间有循环依赖，可能导致系统崩溃  
++ 没有相应的机制让观察者知道所观察的目标对象是怎么发生变化的  
+角色：抽象被观察者角色、抽象观察者角色、具体被观察者角色、具体观察者角色  
+场景：一个公众号，公众号推送出消息，那么关注它的人都能收到推送的消息  
+说明：JDK内置有观察者（Observer接口需要实现）、被观察者（Observable类需要使用继承）
+
+	/**
+	 * 抽象被观察者角色
+	 */
+	public interface Observerable {
+	    void registerObserver(Observer observer);
+	    void removeObserver(Observer observer);
+	    void notifyObserver(String message);
+	}
+
+	/**
+	 * 抽象观察者角色
+	 * 定义一个update()方法，当被观察者调用notifyObserver()方法时，观察者的update()会被调用
+	 */
+	public interface Observer {
+	    void update(String message);
+	}
+
+	/**
+	 * 被观察者
+	 */
+	public class WechatServer implements Observerable{
+	    private List<Observer> observerList = new ArrayList<> ();
+	
+	    @Override
+	    public void registerObserver(Observer observer) {
+	        this.observerList.add (observer);
+	    }
+	
+	    @Override
+	    public void removeObserver(Observer observer) {
+	        this.observerList.remove (observer);
+	    }
+	
+	    @Override
+	    public void notifyObserver(String message) {
+	        for(Observer observer : this.observerList) {
+	            observer.update (message);
+	        }
+	    }
+	}
+
+	/**
+	 * 观察者
+	 */
+	public class FollowObserver implements Observer{
+	    @Override
+	    public void update(String message) {
+	        System.out.println ("observer receives message : " + message);
+	    }
+	}
+
+#### 责任链模式
+特点：将请求的发送者和接收者解耦，使的多个对象都有处理这个请求的机会 
+优点： 
+

@@ -40,4 +40,5 @@
 	11. Channels：AMQP连接可视为"共享单个TCP连接的轻型连接"的通道复用。由于某个应用程序需要与代理进行多个连接，但不希望同时打开多个TCP连接，因为这样会消耗系统资源，并使配置防火墙更加困难。
 	12. Virtual Hosts：虚拟主机；为了使单个代理可以承载多个隔离的“环境”（用户组，交换，队列等），AMQP 0-9-1包含虚拟主机（vhost）的概念。
 	13. AMQP is Extensible：AMQP是可扩展的
-		
+
+### CLI tools、Configuration、等需要用到时候到[官网](https://www.rabbitmq.com/documentation.html)查看吧

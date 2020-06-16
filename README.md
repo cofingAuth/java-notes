@@ -1072,6 +1072,148 @@
 	}
 
 #### 责任链模式
-特点：将请求的发送者和接收者解耦，使的多个对象都有处理这个请求的机会 
-优点： 
+特点：将请求的发送者和接收者解耦，使的多个对象都有处理这个请求的机会  
+优点：1、降低耦合度。它将请求的发送者和接收者解耦。 2、简化了对象。使得对象不需要知道链的结构。 3、增强给对象指派职责的灵活性。通过改变链内的成员或者调动它们的次序，允许动态地新增或者删除责任。 4、增加新的请求处理类很方便。  
+缺点：1、不能保证请求一定被接收。 2、系统性能将受到一定影响，而且在进行代码调试时不太方便，可能会造成循环调用。 3、可能不容易观察运行时的特征，有碍于除错。  
+场景：积分商城，进行兑换商品，商品可能会有需要积分的，有可能免费兑换等情况；如配合数据库配置，他可以很灵活的控制兑换流程；
+
+	//请求体
+	public class ChainRequest {
+	    /**
+	     * 简单用这个表示类型：0表示需要积分，1不需要积分
+	     */
+	    private Integer type;
+	    public Integer getType() {
+	        return type;
+	    }
+	
+	    public void setType(Integer type) {
+	        this.type = type;
+	    }
+	}
+	
+	//责任链的抽象处理类
+	public abstract class AbstractHandler {
+	    protected AbstractHandler nextHandler;
+	
+	    public void setNextHandler(AbstractHandler nextHandler) {
+	        this.nextHandler = nextHandler;
+	    }
+	
+	    protected abstract void handler(ChainRequest chainRequest);
+	}
+	
+	//处理需要积分的处理类
+	public class IntegralCheck extends AbstractHandler{
+	    @Override
+	    protected void handler(ChainRequest chainRequest) {
+	        if(chainRequest.getType () == 0){
+	            System.out.println ("处理积分商品");
+	            return;
+	        }
+	
+	        if(super.nextHandler != null){
+	            super.nextHandler.handler (chainRequest);
+	        }
+	    }
+	}
+	
+	//处理不需要积分的处理类
+	public class UnIntegralCheck extends AbstractHandler{
+	    @Override
+	    protected void handler(ChainRequest chainRequest) {
+	        if(chainRequest.getType () == 1){
+	            System.out.println ("处理不需要积分商品");
+	            return;
+	        }
+	
+	        if(super.nextHandler != null){
+	            super.nextHandler.handler (chainRequest);
+	        }
+	    }
+	}
+	
+	//测试
+	public class Test {
+	    public static void main(String[] args) {
+	        AbstractHandler integralCheck = new IntegralCheck ();
+	        AbstractHandler unIntegralCheck = new UnIntegralCheck ();
+	
+	        integralCheck.setNextHandler (unIntegralCheck);
+	
+	        ChainRequest chainRequest = new ChainRequest ();
+	        chainRequest.setType (1);
+	
+	        integralCheck.handler (chainRequest);
+	    }
+	}
+
+#### 命令模式
+特点：将命令请求封装为一个对象，使得可以用不同的请求来进行参数化  
+优点：1、降低了系统耦合度。 2、新的命令可以很容易添加到系统中去  
+缺点：使用命令模式可能会导致某些系统有过多的具体命令类  
+场景：声音控制门的开关
+
+	public interface Command {
+	    void execute();
+	}
+	
+	/**
+	 * received 真正的命令执行对象
+	 */
+	public class Controller {
+	    public void open(){
+	        System.out.println ("open the door");
+	    }
+	
+	    public void close(){
+	        System.out.println ("close the door");
+	    }
+	}
+	
+	/**
+	 * Command
+	 */
+	public class OpenCommand implements Command {
+	    private Controller controller;
+	
+	    public OpenCommand(Controller controller) {
+	        this.controller = controller;
+	    }
+	
+	    @Override
+	    public void execute() {
+	        this.controller.open ();
+	    }
+	}
+	
+	/**
+	 * Command
+	 */
+	public class CloseCommand implements Command {
+	    private Controller controller;
+	
+	    public CloseCommand(Controller controller) {
+	        this.controller = controller;
+	    }
+	
+	    @Override
+	    public void execute() {
+	        this.controller.close ();
+	    }
+	}
+	
+	public class Test {
+	    public static void main(String[] args) {
+	        Controller controller = new Controller ();
+	
+	        Command openCommand = new OpenCommand (controller);
+	        Command closeCommand = new CloseCommand (controller);
+	
+	        //Invoker调用者
+	        openCommand.execute ();
+	        closeCommand.execute ();
+	    }
+	}
+
 

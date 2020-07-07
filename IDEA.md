@@ -42,3 +42,8 @@
 	+ Ctrl + Alt + B : 查看类或者接口的实现
 	+ Ctrl + F12 : 查看文件结构
 	+ Ctrl + F : 代码查找，按F3向下找；按Shift+F3向上找/返回上一个找到；按Esc退出；
+
+## 其它
+* 文件重命名: Shift + F6
+
+### idea学习，不过里面教学版本较旧，不过影响不大：[IntelliJ-IDEA-Tutorial](https://github.com/judasn/IntelliJ-IDEA-Tutorial)

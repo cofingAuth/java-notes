@@ -1,5 +1,5 @@
 ---
-内容源于书：SpringCloud微服务实战
+内容源于书：SpringCloud微服务实战  
 所以资料较旧，可通过其它渠道获取最新微服务的技术选型，如看Spring Cloud官网
 ---
 

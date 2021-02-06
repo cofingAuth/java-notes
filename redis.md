@@ -8,7 +8,7 @@
 	5. Hash：哈希，由键值（都是字符串）组合映射，可理解为Map
 	6. bitmaps：位图，本身不是数据库结构，而是在String类型上定义的一组面向位的操作，可以想象为以位为单位的数组
 	7. HyperLogLog：概率数据结构，用于估计集合的基数，根据输入的元素进行计算，而不会存储实际数据	
-	8. Stream：流，提供抽象日志数据类型的类地图项的仅追加集合
+	8. geospatial
 
 ### 部分命令，官网查看更多
 
@@ -51,6 +51,7 @@
 * SUNION : 返回并集的元素列表
 * SRANDMEMBER key [count] : 随机返回
 * SPOP key : 随机删除并返回
+* SMOVE 指定元素移动到另外一个集合
 * 集合间运算并返回结果
   * SDIFF key [key...]  差集，即存在集合A，但不存在集合B的元素
   * SINTER key [key...] 交集，即存在集合A，也存在集合B的元素
@@ -75,7 +76,7 @@
 * ZCOUNT key min max 获取指定分数范围内的元素个数
 * ZREM key member [member...] 删除一个或多个元素
 
-### hashes 哈希
+### hash 哈希
 > 散列类型，字典结构，存储字段和字段值映射，字段值只能是字符串，不能嵌套其他数据类型。常用于保存对象
 
 * HSET key field value
@@ -84,9 +85,36 @@
 * HMGET key field [field...]
 * HGETALL
 * HINCRBY
-* HDEL
+* HDEL 
 * HEXISTS key field
 * HSETNX 不存在则插入
+* HKEYS 获取所有键
+* HVALS 获取所有值
+
+### geospatial 地理空间索引半径查询
+
+**相关命令**
+
+- [GEOADD](http://www.redis.cn/commands/geoadd.html)
+- [GEODIST](http://www.redis.cn/commands/geodist.html)
+- [GEOHASH](http://www.redis.cn/commands/geohash.html)
+- [GEOPOS](http://www.redis.cn/commands/geopos.html)
+- [GEORADIUS](http://www.redis.cn/commands/georadius.html)
+- [GEORADIUSBYMEMBER](http://www.redis.cn/commands/georadiusbymember.html)
+
+![redis](D:\mygit\java-notes\image\redis\redis.jpg)
+
+### HyperLogLog
+
+![HyperLogLog](D:\mygit\java-notes\image\redis\HyperLogLog.jpg)
+
+![HyperLogLog2](D:\mygit\java-notes\image\redis\HyperLogLog2.jpg)
+
+### Bitmaps
+
+![Bitmap1](D:\mygit\java-notes\image\redis\Bitmap1.jpg)
+
+![Bitmap2](D:\mygit\java-notes\image\redis\Bitmap2.jpg)
 
 ### 1. 进阶
 

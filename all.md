@@ -42,7 +42,33 @@ volatitle 具有三大特性：
 
 ### CAS
 
-cas 意思是 比较并交换
+**CAS**： （Compare-And-Swap）意思是 比较并交换，它是一条CPU并发原语；它的功能是判断内存某个位置的值是否为预期值，如果是一样则更改为新值，这个过程是原子的。
+
+**底层原理**：依靠Unsafa类，Unsafe类存在于sun.misc包中，其内部方法操作可以像C的指针一样直接操作内存。CAS是一种系统原语，原语是由若干条指令组成，并且执行原语必须是连续的，可以看作把一组指令看成一条CPU指令执行，要么全部执行完，要么全部失败，所以不会造成数据不一致问题。
+
+**例如**：getAndSet 方法，CAS使用自旋方式，每次比较，如果预期与实际值一致，才更新新值。
+
+**缺点**：
+
+1. 循环时间长开销大
+2. 只能保证一个共享变量的原子操作
+3. ABA问题
+
+**常见问题**：
+
+1. 什么是ABA
+
+   atomic原值A，到最后判断时候值还是一样A，中间有一个改变过程B
+
+2. 原子引用、版本原子引用
+
+   原子引用：AtomicReference
+
+   版本原子引用：AtomicStampedReference
+
+3. 如何解决ABA
+
+   使用版本原子引用
 
 
 
@@ -64,21 +90,72 @@ cas 意思是 比较并交换
 
 指尝试获取锁的线程不会立即阻塞，而是采用循环的方式去尝试获取锁。这样的好处是减少线程上下文切换的消耗，缺点是循环会消耗CPU
 
-#### 区别与说明
+#### 独占锁(写锁)/共享锁(读锁)/互斥锁
+
+独占锁：指该锁一次只能被一个线程所持有
+
+共享锁：指该锁可被多个线程所持有
+
+ReentrantReadWriteLock其读锁是共享锁，其写是独占锁
+
+#### 常见问题
 
 1. ReentrantLock
 
-   通过构造器，可以指定该锁是否为公平锁，默认是非公平锁，非公平锁的优点是吞吐量比公平锁大
+   通过构造器，可以指定该锁是否为公平锁，默认是非公平锁，非公平锁的优点是吞吐量比公平锁大；独占锁
 
 2. synchronized
 
-   是非公平锁,可重入锁
+   非公平锁、可重入锁、独占锁
+   
+3. CountDownLatch 倒数（减法）
+
+   让一些线程阻塞直到另一些线程完成一系列操作后才被唤醒
+
+   CountDownLatch主要有两个方法，当一个或多个线程调用 await 方法时，调用线程会被阻塞。其他线程调用 countDown 方法会将计数器减1，当计数器的值变为零时，调用线程会被唤醒，继续执行。
+
+4. CyclicBarrier 屏障（加法）
+
+   让一组线程到达一个屏障（同步点）时被阻塞，直到最后一个线程到达屏障时，屏障才会开门，所有被屏障拦截的线程才会继续执行，线程进入屏障通过CyclicBarrier的 await 方法
+
+5. Semaphore 信号量
+
+   信号量主要用于两个目的，一个是用于多个共享资源的互斥使用，另一个用于并发线程数的控制
+
+   
 
 
 
+## 集合
 
+### ArrayList
 
+线程不安全；
 
+**出现异常**：
+
+1. java.util.ConcurrentModificationException 并发修改异常：边修改，边使用迭代器读问题
+2. java.lang.ArrayIndexOutOfBoundsException 数组越界，添加问题
+
+**解决方案**：
+
+1. Vector
+2. Collections.synchronizedList(new ArrayList<>())
+3. CopyOnWriteArrayList 写时复制
+
+### HashSet
+
+**线程不安全解决方案**：
+
+1. Collections.synchronizedSet(new HashSet<>())
+2. CopyOnWriteArraySet 底层是CopyOnWriteArrayList
+
+### HashMap
+
+**线程不安全解决方案**：
+
+1. Collections.synchronizedMap(new HashMap<>())
+2. ConcurrentHashMap
 
 
 

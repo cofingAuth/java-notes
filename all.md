@@ -157,7 +157,42 @@ ReentrantReadWriteLock其读锁是共享锁，其写是独占锁
 1. Collections.synchronizedMap(new HashMap<>())
 2. ConcurrentHashMap
 
+### 阻塞队列
 
+**意思**：它是一个队列，并且是具有阻塞功能的队列
+
+* 当阻塞队列是空时，从队列中获取元素的操作将会被阻塞
+* 当阻塞队列是满时，往队列里添加元素的操作将会被阻塞
+
+**好处**：不需要关心什么时候需要阻塞线程，什么时候需要唤醒线程，这一切BlockingQueue自动解决
+
+**接口**：BlockingQueue
+
+**实现**：
+
+* ArrayBlockingQueue：由数组结构组成的有界阻塞队列
+* LinkedBlockingQueue：由链表结构组成的有界（默认Integer.MAX_VALUE）阻塞队列
+* PriorityBlockingQueue：支持优先级排序的无界阻塞队列
+* DelayQueue：使用优先级队列实现的延迟无界阻塞队列
+* SynchronousQueue：不存储元素的阻塞队列，也即单个元素的队列（没有容量，每一个put操作必须要等待一个take操作，否则不能继续添加元素）
+* LinkedTransferQueue：由链表结构组成的无界阻塞队列
+* LinkedBlockingDeque：由链表结构组成的双向阻塞队列
+
+**用在哪里**：生产者消费者模式、线程池、消息中间件
+
+**常用与区别**：
+
+| 方法类型 | 抛出异常  | 特殊值   | 阻塞   | 超时                 |
+| -------- | --------- | -------- | ------ | -------------------- |
+| 插入     | add(e)    | offer(e) | put(e) | offer(e, time, unit) |
+| 移除     | remove()  | poll()   | take() | poll(time,. unit)    |
+| 检查     | element() | peek()   | 不可用 | 不可用               |
+
+| 抛出异常 | 当阻塞队列满时，再往队列里add插入元素就会抛出异常<br>当阻塞队列空时，再往队列里remove移除元素就会抛出异常 |
+| -------- | :----------------------------------------------------------- |
+| 特殊值   | 插入方法，成功true，失败false<br>移除方法，成功返回队列的元素，队列里面没有元素就返回null |
+| 一直阻塞 | 当阻塞队列满时，再往队列里put元素就会阻塞线程直到put成功<br/>当阻塞队列空时，再往队列里take元素就会阻塞线程直到take成功 |
+| 超时     | 当阻塞队列满时，再往队列里插入元素，等待time时间后还不成功就返回false<br/>当阻塞队列空时，再往队列里移除元素，阻塞线程等待time时间后没数据就返回null |
 
 
 
